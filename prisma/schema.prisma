@@ -1,0 +1,156 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Occasion {
+  OFFICE
+  DATE
+  NIGHT_OUT
+  GYM
+  CASUAL
+  FORMAL
+  OUTDOORS
+}
+
+enum Intensity {
+  SUBTLE
+  MODERATE
+  LOUD
+}
+
+model User {
+  id             String           @id @default(cuid())
+  email          String           @unique
+  passwordHash   String?
+  username       String           @unique
+  displayName    String
+  avatarUrl      String?
+  bio            String?
+  location       String?
+  styleTags      String[]         @default([])
+  favoriteNotes  String[]         @default([])
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  accounts       Account[]
+  sessions       Session[]
+  collection     CollectionItem[]
+  wotdPosts      WotdPost[]
+  likes          Like[]
+  comments       Comment[]
+}
+
+model Fragrance {
+  id                String           @id @default(cuid())
+  name              String
+  brand             String
+  concentration     String
+  year              Int?
+  notes             String[]
+  accords           String[]
+  seasonTags        String[]
+  occasionTags      String[]
+  vibeTags          String[]
+  longevityScore    Int
+  projectionScore   Int
+  imageUrl          String
+  thumbnailUrl      String?
+  createdAt         DateTime         @default(now())
+  collectionItems   CollectionItem[]
+  wotdPrimary       WotdPost[]       @relation("PrimaryFragrance")
+  wotdLayering      WotdPost[]       @relation("LayeringFragrance")
+}
+
+model CollectionItem {
+  id              String      @id @default(cuid())
+  userId          String
+  fragranceId     String
+  rating          Int?
+  wearCount       Int         @default(0)
+  wouldRepurchase Boolean     @default(false)
+  signature       Boolean     @default(false)
+  seasonUse       String[]    @default([])
+  occasionUse     String[]    @default([])
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fragrance       Fragrance   @relation(fields: [fragranceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, fragranceId])
+}
+
+model WotdPost {
+  id                  String      @id @default(cuid())
+  userId              String
+  fragranceId         String
+  layeringFragranceId String?
+  caption             String?
+  occasion            Occasion?
+  setting             String?
+  outfitStyle         String?
+  createdAt           DateTime    @default(now())
+  user                User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fragrance           Fragrance   @relation("PrimaryFragrance", fields: [fragranceId], references: [id])
+  layeringFragrance   Fragrance?  @relation("LayeringFragrance", fields: [layeringFragranceId], references: [id])
+  likes               Like[]
+  comments            Comment[]
+}
+
+model Like {
+  id      String   @id @default(cuid())
+  userId  String
+  postId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post    WotdPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  body      String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      WotdPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([sessionToken])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@id([identifier, token])
+}
