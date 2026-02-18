@@ -24,67 +24,90 @@ enum Intensity {
 }
 
 model User {
-  id             String           @id @default(cuid())
-  email          String           @unique
-  passwordHash   String?
-  username       String           @unique
-  displayName    String
-  avatarUrl      String?
-  bio            String?
-  location       String?
-  styleTags      String[]         @default([])
-  favoriteNotes  String[]         @default([])
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  accounts       Account[]
-  sessions       Session[]
-  collection     CollectionItem[]
-  wotdPosts      WotdPost[]
-  likes          Like[]
-  comments       Comment[]
+  id            String           @id @default(cuid())
+  email         String           @unique
+  passwordHash  String?
+  username      String           @unique
+  displayName   String
+  bio           String?
+  image         String?
+  avatarUrl     String?
+  location      String?
+  styleTags     String[]         @default([])
+  favoriteNotes String[]         @default([])
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  collection    CollectionItem[]
+  wotdPosts     WotdPost[]
+  likes         Like[]
+  comments      Comment[]
+  following     Follow[]         @relation("Following")
+  followers     Follow[]         @relation("Followers")
+
+  @@index([username])
 }
 
 model Fragrance {
-  id                String           @id @default(cuid())
-  name              String
-  brand             String
-  concentration     String
-  year              Int?
-  notes             String[]
-  accords           String[]
-  seasonTags        String[]
-  occasionTags      String[]
-  vibeTags          String[]
-  longevityScore    Int
-  projectionScore   Int
-  imageUrl          String
-  thumbnailUrl      String?
-  createdAt         DateTime         @default(now())
-  collectionItems   CollectionItem[]
-  wotdPrimary       WotdPost[]       @relation("PrimaryFragrance")
-  wotdLayering      WotdPost[]       @relation("LayeringFragrance")
+  id              String           @id @default(cuid())
+  name            String
+  brand           String
+  concentration   String
+  year            Int?
+  notes           String[]
+  seasons         String[]         @default([])
+  accords         String[]
+  seasonTags      String[]
+  occasionTags    String[]
+  vibeTags        String[]
+  longevityScore  Int
+  projectionScore Int
+  imageUrl        String
+  thumbnailUrl    String?
+  createdAt       DateTime         @default(now())
+  collectionItems CollectionItem[]
+  wotdPrimary     WotdPost[]       @relation("PrimaryFragrance")
+  wotdLayering    WotdPost[]       @relation("LayeringFragrance")
+
+  @@index([brand])
+  @@index([name])
 }
 
 model CollectionItem {
-  id              String      @id @default(cuid())
+  id              String    @id @default(cuid())
   userId          String
   fragranceId     String
+  ownershipStatus String?
   rating          Int?
-  wearCount       Int         @default(0)
-  wouldRepurchase Boolean     @default(false)
-  signature       Boolean     @default(false)
-  seasonUse       String[]    @default([])
-  occasionUse     String[]    @default([])
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  fragrance       Fragrance   @relation(fields: [fragranceId], references: [id], onDelete: Cascade)
+  wearCount       Int       @default(0)
+  wouldRepurchase Boolean   @default(false)
+  signature       Boolean   @default(false)
+  seasonUse       String[]  @default([])
+  occasionUse     String[]  @default([])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fragrance       Fragrance @relation(fields: [fragranceId], references: [id], onDelete: Cascade)
 
   @@unique([userId, fragranceId])
+  @@index([userId, createdAt])
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+  follower    User     @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followingId])
 }
 
 model WotdPost {
-  id                  String      @id @default(cuid())
+  id                  String     @id @default(cuid())
   userId              String
   fragranceId         String
   layeringFragranceId String?
@@ -92,20 +115,22 @@ model WotdPost {
   occasion            Occasion?
   setting             String?
   outfitStyle         String?
-  createdAt           DateTime    @default(now())
-  user                User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  fragrance           Fragrance   @relation("PrimaryFragrance", fields: [fragranceId], references: [id])
-  layeringFragrance   Fragrance?  @relation("LayeringFragrance", fields: [layeringFragranceId], references: [id])
+  createdAt           DateTime   @default(now())
+  user                User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fragrance           Fragrance  @relation("PrimaryFragrance", fields: [fragranceId], references: [id])
+  layeringFragrance   Fragrance? @relation("LayeringFragrance", fields: [layeringFragranceId], references: [id])
   likes               Like[]
   comments            Comment[]
+
+  @@index([userId, createdAt])
 }
 
 model Like {
-  id      String   @id @default(cuid())
-  userId  String
-  postId  String
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post    WotdPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  id     String   @id @default(cuid())
+  userId String
+  postId String
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post   WotdPost @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@unique([userId, postId])
 }

@@ -38,6 +38,14 @@ export async function Nav() {
           {session?.user?.id && (
             <Link
               className="transition-colors hover:text-foreground"
+              href="/wotd"
+            >
+              WOTD
+            </Link>
+          )}
+          {session?.user?.id && (
+            <Link
+              className="transition-colors hover:text-foreground"
               href="/wear-today"
             >
               Wear Today
