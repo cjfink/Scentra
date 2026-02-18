@@ -12,6 +12,7 @@ export function AddCollectionForm() {
 
   async function add() {
     if (!selected) return;
+
     await fetch("/api/collection", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -19,28 +20,41 @@ export function AddCollectionForm() {
         fragranceId: selected.id,
         rating: Number(rating),
         wearCount: Number(wearCount),
-        wouldRepurchase: true,
-        signature: false,
-        seasonUse: ["spring", "summer"],
-        occasionUse: ["office"]
-      })
+        ownershipStatus: "owned",
+      }),
     });
+
     window.location.reload();
   }
 
   return (
     <div className="space-y-4">
       <Typeahead onSelect={setSelected} />
-      {selected && (
+      {selected ? (
         <div className="rounded-md border p-4">
           <p className="font-medium">Add details for {selected.name}</p>
           <div className="mt-3 grid grid-cols-2 gap-3">
-            <Input value={rating} onChange={(e) => setRating(e.target.value)} type="number" min={1} max={10} placeholder="Rating" />
-            <Input value={wearCount} onChange={(e) => setWearCount(e.target.value)} type="number" min={0} placeholder="Wear count" />
+            <Input
+              value={rating}
+              onChange={(e) => setRating(e.target.value)}
+              type="number"
+              min={1}
+              max={10}
+              placeholder="Rating"
+            />
+            <Input
+              value={wearCount}
+              onChange={(e) => setWearCount(e.target.value)}
+              type="number"
+              min={0}
+              placeholder="Wear count"
+            />
           </div>
-          <Button onClick={add} className="mt-3">Add to collection</Button>
+          <Button onClick={add} className="mt-3">
+            Add to collection
+          </Button>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

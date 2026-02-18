@@ -10,8 +10,8 @@ export async function signupAction(payload: unknown) {
 
   const exists = await prisma.user.findFirst({
     where: {
-      OR: [{ email: parsed.data.email }, { username: parsed.data.username }]
-    }
+      OR: [{ email: parsed.data.email }, { username: parsed.data.username }],
+    },
   });
   if (exists) return { error: "Email or username already exists" };
 
@@ -22,9 +22,8 @@ export async function signupAction(payload: unknown) {
       username: parsed.data.username,
       displayName: parsed.data.displayName,
       passwordHash,
-      styleTags: ["clean"],
-      favoriteNotes: ["musk"]
-    }
+      styleTags: [],
+    },
   });
 
   return { ok: true };

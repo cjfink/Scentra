@@ -1,56 +1,81 @@
-# Scentra MVP
+# Scentra
 
-Scentra is a social fragrance network MVP built with Next.js App Router, Prisma + PostgreSQL, NextAuth, Tailwind, and TypeScript.
+Scentra is a social fragrance app built with Next.js App Router, Prisma/PostgreSQL, and NextAuth.
 
-## Features
-- Auth (credentials + OAuth-ready via GitHub)
-- User profiles (`/u/[username]`) with tags and notes
-- Seeded fragrance catalog with image URLs
-- Explore page with filters
-- Collection management with typeahead + image previews
-- WOTD feed with likes/comments API
-- Collection gap recommendation heuristic
-- Wear-today recommendations based on weather and preferences
+## Core features
 
-## Tech Stack
-- Next.js 14 + TypeScript + Tailwind
-- shadcn-style UI primitives + lucide-react
-- Prisma + PostgreSQL
-- NextAuth
-- Zod validation
+- Email/password signup and login.
+- Personal fragrance collections.
+- Wear Today recommendations from your own collection using weather-aware heuristics.
+- Follow/follower relationships and profile pages.
+- WOTD posting and feed from people you follow.
 
-## Setup
-1. Copy envs:
-   ```bash
-   cp .env.example .env
-   ```
-2. Start postgres:
-   ```bash
-   docker compose up -d
-   ```
-3. Install dependencies:
+## Required environment variables
+
+Create a `.env` file:
+
+```bash
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/scentra"
+NEXTAUTH_SECRET="replace-with-strong-secret"
+NEXTAUTH_URL="http://localhost:3000"
+WEATHER_PROVIDER="openweather"
+WEATHER_API_KEY="your_openweather_api_key"
+```
+
+Notes:
+
+- If `WEATHER_API_KEY` is missing or weather request fails, Wear Today uses a neutral fallback weather profile.
+- `WEATHER_PROVIDER=none` forces fallback mode.
+
+## Local development
+
+1. Install dependencies:
    ```bash
    npm install
    ```
-4. Generate/migrate db:
+2. Start PostgreSQL:
    ```bash
-   npm run db:migrate
+   docker compose up -d
    ```
-5. Seed data:
+3. Run migrations:
+   ```bash
+   npx prisma migrate deploy
+   ```
+4. Seed sample data:
    ```bash
    npm run db:seed
    ```
-6. Start app:
+5. Start the app:
    ```bash
    npm run dev
    ```
 
-Demo credentials after seed:
-- email: `demo@scentra.app`
-- password: `demo1234`
+## Vercel deploy notes
 
-## Scripts
-- `npm run dev`
-- `npm run db:migrate`
-- `npm run db:seed`
-- `npm run lint`
+1. Import the repo into Vercel.
+2. Add all required environment variables in Vercel Project Settings.
+3. Redeploy after setting vars.
+4. Build command can use:
+   ```bash
+   npm run vercel-build
+   ```
+
+## Key pages
+
+- `/feed` – WOTD feed.
+- `/wotd` – create a WOTD post.
+- `/wear-today` – weather-aware wear recommendations.
+- `/explore` – fragrance catalog/search.
+- `/collection` – your personal collection.
+- `/u/[username]` – user profile.
+- `/u/[username]/collection` – public collection page.
+
+## API endpoints
+
+- `GET|POST|DELETE /api/collection`
+- `POST /api/follow`
+- `GET /api/following?username=...`
+- `GET /api/followers?username=...`
+- `POST /api/wotd`
+- `GET /api/wotd/feed`
+- `POST /api/recs/wear-today`
