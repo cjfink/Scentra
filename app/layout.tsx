@@ -1,16 +1,10 @@
 import "./globals.css";
+import type { ReactNode } from "react";
 import { Nav } from "@/components/nav";
 
-<<<<<<< codex/update-scentra-styling-for-professionalism-zwoi3g
 export const dynamic = "force-dynamic";
 
-=======
->>>>>>> main
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
