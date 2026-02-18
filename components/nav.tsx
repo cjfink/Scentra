@@ -6,7 +6,7 @@ export async function Nav() {
   const session = await auth();
 
   return (
-    <nav className="sticky top-0 z-20 border-b border-border/80 bg-background/90 backdrop-blur-sm">
+    <nav className="sticky top-0 z-20 border-b border-border/80 bg-background/95 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5">
         <Link
           href="/"
@@ -14,7 +14,7 @@ export async function Nav() {
         >
           Scentra
         </Link>
-        <div className="flex items-center gap-5 text-xs font-medium uppercase tracking-[0.17em] text-muted-foreground sm:text-sm">
+        <div className="flex items-center gap-5 text-sm font-medium text-muted-foreground">
           <Link
             className="transition-colors hover:text-foreground"
             href="/feed"
@@ -50,7 +50,7 @@ export async function Nav() {
                 await signOut({ redirectTo: "/login" });
               }}
             >
-              <Button className="ml-2" variant="outline" type="submit">
+              <Button className="ml-1" variant="outline" type="submit">
                 Sign out
               </Button>
             </form>
