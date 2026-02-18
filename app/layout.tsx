@@ -1,8 +1,11 @@
 import "./globals.css";
 import { Nav } from "@/components/nav";
 
+<<<<<<< codex/update-scentra-styling-for-professionalism-zwoi3g
 export const dynamic = "force-dynamic";
 
+=======
+>>>>>>> main
 export default function RootLayout({
   children,
 }: {
